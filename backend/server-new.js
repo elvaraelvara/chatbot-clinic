@@ -2,7 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const db = require('./db'); // Pastikan db.js sudah dikonfigurasi
+const db = require('./db');
 const axios = require('axios');
 
 const app = express();
@@ -24,26 +24,21 @@ app.get('/dokter', (req, res) => {
   });
 });
 
+/* === POST: Tambah Antrean === */
 app.post('/antrean', (req, res) => {
   const { nama, nik, keluhan, kodedokter, nohp } = req.body;
 
-  const getLatestAntreanQuery = `
-    SELECT nomorantrean 
+  const countQuery = `
+    SELECT COUNT(*) AS jumlah 
     FROM masterAntrean 
-    ORDER BY id DESC 
-    LIMIT 1
+    WHERE dibatalkan = 0 AND dilayani = 0
   `;
 
-  db.query(getLatestAntreanQuery, (err, result) => {
-    if (err) return res.status(500).send({ error: 'Gagal mengambil nomor antrean' });
+  db.query(countQuery, (err, result) => {
+    if (err) return res.status(500).send({ error: 'Gagal menghitung antrean' });
 
-    let nomorAntrean = 1;
-    if (result.length > 0) {
-      nomorAntrean = parseInt(result[0].nomorantrean) + 1;
-    }
-
+    const nomorAntrean = result[0].jumlah + 1;
     const nomorAntreanFormatted = String(nomorAntrean).padStart(3, '0');
-    const angkaAntrean = nomorAntreanFormatted;
 
     const insertQuery = `
       INSERT INTO masterAntrean 
@@ -52,7 +47,7 @@ app.post('/antrean', (req, res) => {
       VALUES (?, ?, '001', ?, ?, ?, ?, ?, NOW(), NOW(), 'L001', 'chatbot', '0217B098', 'Pratama Mitra Medicare', 'No', 10)
     `;
 
-    db.query(insertQuery, [nomorAntreanFormatted, angkaAntrean, nik, nama, keluhan, kodedokter, nohp], (err) => {
+    db.query(insertQuery, [nomorAntreanFormatted, nomorAntreanFormatted, nik, nama, keluhan, kodedokter, nohp], (err) => {
       if (err) return res.status(500).send({ error: 'Gagal menambahkan antrean', details: err });
       res.status(201).json({
         message: 'Antrean berhasil ditambahkan',
@@ -62,6 +57,7 @@ app.post('/antrean', (req, res) => {
   });
 });
 
+/* === GET: Ambil Semua Antrean (Admin) === */
 app.get('/admin/antrean', (req, res) => {
   const query = `
     SELECT id, nomorantrean, angkaantrean, nama, nik, keluhan, kodedokter, nohp, tanggaldibuat,
@@ -75,37 +71,31 @@ app.get('/admin/antrean', (req, res) => {
   });
 });
 
+/* === POST: Hapus Antrean dan Reorder === */
 app.post('/admin/antrean/update', (req, res) => {
   const { id, status } = req.body;
 
-  const getNomorQuery = 'SELECT nomorantrean FROM masterAntrean WHERE id = ?';
-  db.query(getNomorQuery, [id], (err, result) => {
-    if (err || result.length === 0) return res.status(404).send({ error: 'Data tidak ditemukan' });
+  const deleteQuery = `DELETE FROM masterAntrean WHERE id = ?`;
+  db.query(deleteQuery, [id], (err) => {
+    if (err) return res.status(500).send({ error: 'Gagal menghapus antrean' });
 
-    const nomorToRemove = parseInt(result[0].nomorantrean);
+    const reorderQuery = `
+      SET @num := 0;
+      UPDATE masterAntrean
+      SET nomorantrean = (@num := @num + 1),
+          angkaantrean = LPAD(@num, 3, '0')
+      WHERE dibatalkan = 0 AND dilayani = 0
+      ORDER BY tanggaldibuat ASC
+    `;
 
-    const deleteQuery = 'DELETE FROM masterAntrean WHERE id = ?';
-    db.query(deleteQuery, [id], (err) => {
-      if (err) return res.status(500).send({ error: 'Gagal menghapus antrean' });
-
-      const updateQuery = `
-        UPDATE masterAntrean 
-        SET nomorantrean = nomorantrean - 1,
-            angkaantrean = LPAD(nomorantrean - 1, 3, '0')
-        WHERE nomorantrean > ?
-      `;
-
-      db.query(updateQuery, [nomorToRemove], (err) => {
-        if (err) return res.status(500).send({ error: 'Gagal memperbarui antrean' });
-
-        res.status(200).json({
-          message: `Antrean dengan status "${status}" berhasil dihapus dan urutan diperbarui.`
-        });
-      });
+    db.query(reorderQuery, (err2) => {
+      if (err2) return res.status(500).send({ error: 'Gagal mengurutkan ulang antrean' });
+      res.status(200).json({ message: `Antrean dihapus dan antrean aktif diurutkan ulang.` });
     });
   });
 });
 
+/* === PUT: Update Status Antrean dan Reorder === */
 app.put('/admin/antrean/:id', (req, res) => {
   const id = req.params.id;
   const {
@@ -117,58 +107,42 @@ app.put('/admin/antrean/:id', (req, res) => {
     tanggalbatal
   } = req.body;
 
-  const getNomorQuery = 'SELECT nomorantrean FROM masterAntrean WHERE id = ?';
+  const updateStatusQuery = `
+    UPDATE masterAntrean
+    SET dibatalkan = ?, dipanggil = ?, dilayani = ?, dilewati = ?,
+        alasanbatal = ?, tanggalbatal = ?
+    WHERE id = ?
+  `;
 
-  db.query(getNomorQuery, [id], (err, result) => {
-    if (err || result.length === 0) {
-      return res.status(404).json({ message: 'Data tidak ditemukan' });
+  db.query(
+    updateStatusQuery,
+    [dibatalkan, dipanggil, dilayani, dilewati, alasanbatal, tanggalbatal, id],
+    (err) => {
+      if (err) return res.status(500).json({ message: 'Gagal update status antrean' });
+
+      const reorderQuery = `
+        SET @num := 0;
+        UPDATE masterAntrean
+        SET nomorantrean = (@num := @num + 1),
+            angkaantrean = LPAD(@num, 3, '0')
+        WHERE dibatalkan = 0 AND dilayani = 0
+        ORDER BY tanggaldibuat ASC
+      `;
+
+      db.query(reorderQuery, (err2) => {
+        if (err2) return res.status(500).json({ message: 'Gagal mengurutkan ulang antrean' });
+        res.status(200).json({ message: 'Status diupdate dan antrean aktif diurutkan ulang' });
+      });
     }
-
-    const nomorToRemove = parseInt(result[0].nomorantrean);
-
-    const updateStatusQuery = `
-      UPDATE masterAntrean
-      SET dibatalkan = ?, dipanggil = ?, dilayani = ?, dilewati = ?,
-          alasanbatal = ?, tanggalbatal = ?
-      WHERE id = ?
-    `;
-
-    db.query(
-      updateStatusQuery,
-      [dibatalkan, dipanggil, dilayani, dilewati, alasanbatal, tanggalbatal, id],
-      (err) => {
-        if (err) {
-          console.error("Gagal update status:", err);
-          return res.status(500).json({ message: 'Gagal update status antrean' });
-        }
-
-        const reorderQuery = `
-          UPDATE masterAntrean
-          SET nomorantrean = nomorantrean - 1,
-              angkaantrean = LPAD(nomorantrean - 1, 3, '0')
-          WHERE nomorantrean > ?
-        `;
-
-        db.query(reorderQuery, [nomorToRemove], (err) => {
-          if (err) {
-            return res.status(500).json({ message: 'Gagal menggeser nomor antrean' });
-          }
-
-          res.status(200).json({ message: 'Status antrean berhasil diupdate dan antrean diurutkan ulang' });
-        });
-      }
-    );
-  });
+  );
 });
-app.listen(port, () => {
-  console.log(` Server berjalan di http://localhost:${port}`);
-});
+
 /* === GET: Jumlah Antrean Saat Ini === */
 app.get('/antreansekarang', (req, res) => {
   const query = `
     SELECT COUNT(*) AS jumlah
     FROM masterAntrean
-    WHERE dibatalkan = 0 AND dilayani = 0
+    WHERE dibatalkan = 0 AND dilayani = 0  c
   `;
 
   db.query(query, (err, result) => {
@@ -179,6 +153,8 @@ app.get('/antreansekarang', (req, res) => {
     res.status(200).json({ jumlah_antrean: result[0].jumlah });
   });
 });
+
+/* === POST: Tanya Klinik ke Chatbot === */
 app.post('/tanyaklinik', async (req, res) => {
   const { pertanyaan } = req.body;
   try {
@@ -187,4 +163,9 @@ app.post('/tanyaklinik', async (req, res) => {
   } catch (err) {
     res.status(500).send({ error: "Gagal menghubungi chatbot", detail: err.message });
   }
+});
+
+/* === RUN SERVER === */
+app.listen(port, () => {
+  console.log(`✅ Server berjalan di http://localhost:${port}`);
 });
