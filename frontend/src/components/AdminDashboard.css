@@ -1,0 +1,124 @@
+/* === GLOBAL RESET === */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  overflow-y: auto;
+}
+
+/* === WRAPPER UTAMA === */
+.admin-container {
+  padding: 32px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* === LOGO === */
+.admin-logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.admin-logo img {
+  height: 80px;
+  object-fit: contain;
+}
+
+/* === AREA SCROLLABLE === */
+.admin-scroll-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 6px;
+  border-radius: 12px;
+}
+
+/* SCROLLBAR */
+.admin-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+.admin-scroll-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+/* === TABEL === */
+.admin-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+.admin-table thead {
+  background-color: #33cabb;
+  color: white;
+}
+
+.admin-table th, .admin-table td {
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.admin-table th {
+  font-weight: 600;
+}
+
+.admin-table td {
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* === AKSI BUTTON === */
+.action-cell {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.action-button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-width: 70px;
+  text-align: center;
+}
+
+/* Warna Tombol */
+.action-button.blue {
+  background: #33cabb;
+}
+.action-button.blue:hover {
+  background: #1d776e;
+}
+
+.action-button.orange {
+  background: #2e74b5;
+}
+.action-button.orange:hover {
+  background: #194f7d;
+}
+
+.action-button.red {
+  background: #3596dc;
+}
+.action-button.red:hover {
+  background: #245a8d;
+}

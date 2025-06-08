@@ -1,0 +1,49 @@
+.chatbot-container {
+  width: 400px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.chat-window {
+  height: 500px;
+  overflow-y: auto;
+}
+
+.chat-bubble {
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.chat-bubble.bot {
+  background-color: #f0f0f0;
+  text-align: left;
+}
+
+.chat-bubble.user {
+  background-color: #4caf50;
+  color: white;
+  text-align: right;
+}
+
+.antrean-form input, .antrean-form textarea, .antrean-form select {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px;
+}
+
+.chat-input-form {
+  display: flex;
+  margin-top: 10px;
+}
+
+.chat-input-form input {
+  flex-grow: 1;
+  padding: 8px;
+}
+
+.chat-input-form button {
+  padding: 8px;
+}
