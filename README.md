@@ -2,6 +2,10 @@
 
 ## 📘 Project Overview
 This is a web-based chatbot system developed using **IndoBERT**, a pre-trained Large Language Model (LLM) for Indonesian. The chatbot serves patients of **Klinik Pratama Mitra Medicare** by answering questions about healthcare services such as doctor schedules, queue registration, clinic operations, and insurance — fully integrated with a **MySQL-based real-time database** and an **admin dashboard**.
+---
+## 🎥 Project Demonstration
+
+[![Watch the demo](https://img.youtube.com/vi/w9kE01X9VeM/hqdefault.jpg)](https://youtu.be/w9kE01X9VeM)
 
 ---
 
