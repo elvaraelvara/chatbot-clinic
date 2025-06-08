@@ -29,9 +29,6 @@ This is a web-based chatbot system developed using **IndoBERT**, a pre-trained L
 - IndoBERT (fine-tuned):  
   - **Accuracy**: 95.24%  
   - **F1-Score**: 0.8277
-- Baseline IndoBERT (non-paired):  
-  - **Accuracy**: 60.79%  
-  - **F1-Score**: 0.8173
 - User satisfaction score: **91.25%**
 
 ---
