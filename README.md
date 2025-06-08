@@ -104,8 +104,7 @@ npm start
 ## 📊 Dataset
 - Collected from real patient questions at Klinik Mitra Medicare
 - Covers: doctor schedule, registration, services, insurance, etc.
-- Download: [Kaggle Dataset – Tugas Akhir](https://www.kaggle.com/datasets/teresiaelvara/)
+- Download: [Kaggle Dataset](https://www.kaggle.com/datasets/teresiaelvara/tugaskahir)
 
 ---
 
----
