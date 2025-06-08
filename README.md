@@ -2,7 +2,9 @@
 
 ## 📘 Project Overview
 This is a web-based chatbot system developed using **IndoBERT**, a pre-trained Large Language Model (LLM) for Indonesian. The chatbot serves patients of **Klinik Pratama Mitra Medicare** by answering questions about healthcare services such as doctor schedules, queue registration, clinic operations, and insurance — fully integrated with a **MySQL-based real-time database** and an **admin dashboard**.
+
 ---
+
 ## 🎥 Project Demonstration
 
 [![Watch the demo](https://img.youtube.com/vi/w9kE01X9VeM/hqdefault.jpg)](https://youtu.be/w9kE01X9VeM)
@@ -27,13 +29,13 @@ This is a web-based chatbot system developed using **IndoBERT**, a pre-trained L
 ### 👨‍⚕️ Admin Dashboard
 - View all active queues
 - Update patient statuses
-- View patient and doctor details
+- Access patient and doctor details
 
 ### 📊 Evaluation Metrics
-- IndoBERT (fine-tuned):  
-  - **Accuracy**: 95.24%  
-  - **F1-Score**: 0.8277
-- User satisfaction score: **91.25%**
+- **IndoBERT (fine-tuned)**  
+  - Accuracy: **95.24%**  
+  - F1-Score: **0.8277**
+- **User Satisfaction Score**: **91.25%**
 
 ---
 
@@ -41,10 +43,10 @@ This is a web-based chatbot system developed using **IndoBERT**, a pre-trained L
 
 - **Model**: IndoBERT (`indobenchmark/indobert-base-p1`)
 - **Architecture**: 12-layer Transformer encoder
-- **Training**: Binary classification (relevant/irrelevant QA pairs)
-- **Data**: 409 manually-labeled question-answer pairs
-- **Technique**: Hard negative sampling, pairwise fine-tuning
-- **Evaluation**: BERTScore (Precision, Recall, F1) + Accuracy
+- **Training Objective**: Binary classification (relevant/irrelevant QA pairs)
+- **Dataset**: 409 manually-labeled question–answer pairs
+- **Training Technique**: Hard negative sampling, pairwise fine-tuning
+- **Evaluation**: BERTScore (Precision, Recall, F1) and Accuracy
 
 ---
 
@@ -57,7 +59,7 @@ This is a web-based chatbot system developed using **IndoBERT**, a pre-trained L
 | Database    | MySQL (doctor schedules, queues)       |
 | Embedding   | SentenceTransformer + FAISS            |
 | Evaluation  | `bert_score`, `sklearn`                |
-| Model API   | HuggingFace Transformers, Torch        |
+| Model API   | HuggingFace Transformers, PyTorch      |
 
 ---
 
@@ -103,8 +105,8 @@ npm start
 
 ## 📊 Dataset
 - Collected from real patient questions at Klinik Mitra Medicare
-- Covers: doctor schedule, registration, services, insurance, etc.
-- Download: [Kaggle Dataset](https://www.kaggle.com/datasets/teresiaelvara/tugaskahir)
+- Topics: doctor schedules, registration, services, insurance, etc.
+- Download: [Kaggle Dataset – Tugas Akhir](https://www.kaggle.com/datasets/teresiaelvara/tugaskahir)
 
 ---
 
